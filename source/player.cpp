@@ -4,7 +4,7 @@
 #include <jaffarCommon/logger.hpp>
 #include <jaffarCommon/json.hpp>
 #include "argparse/argparse.hpp"
-#include "gpgxInstance.hpp"
+#include "mgbaInstance.hpp"
 #include "playbackInstance.hpp"
 
 int main(int argc, char *argv[])
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
   jaffarCommon::logger::refreshTerminal();
 
   // Creating emulator instance  
-  auto e = gpgx::EmuInstance(configJs);
+  auto e = mgba::EmuInstance(configJs);
 
   // Initializing emulator instance
   e.initialize();

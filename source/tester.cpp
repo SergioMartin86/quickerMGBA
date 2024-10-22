@@ -9,7 +9,7 @@
 #include <jaffarCommon/timing.hpp>
 #include <jaffarCommon/logger.hpp>
 #include <jaffarCommon/file.hpp>
-#include "gpgxInstance.hpp"
+#include "mgbaInstance.hpp"
 #include <chrono>
 #include <sstream>
 #include <vector>
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
   const auto differentialCompressionUseZlib = differentialCompressionJs["Use Zlib"].get<bool>();
 
   // Creating emulator instance
-  auto e = gpgx::EmuInstance(configJs);
+  auto e = mgba::EmuInstance(configJs);
 
   // Initializing emulator instance
   e.initialize();

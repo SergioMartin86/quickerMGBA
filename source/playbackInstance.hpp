@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gpgxInstance.hpp"
+#include "mgbaInstance.hpp"
 #include <string>
 #include <jaffarCommon/hash.hpp>
 #include <jaffarCommon/exceptions.hpp>
@@ -20,7 +20,7 @@ class PlaybackInstance
   public:
 
   // Initializes the playback module instance
-  PlaybackInstance(gpgx::EmuInstance *emu, const std::vector<std::string> &sequence, const std::string& cycleType) :
+  PlaybackInstance(mgba::EmuInstance *emu, const std::vector<std::string> &sequence, const std::string& cycleType) :
    _emu(emu)
   {
     // Getting full state size
@@ -158,7 +158,7 @@ class PlaybackInstance
   std::vector<stepData_t> _stepSequence;
 
   // Pointer to the contained emulator instance
-  gpgx::EmuInstance *const _emu;
+  mgba::EmuInstance *const _emu;
 
   // Full size of the game state
   size_t _fullStateSize;

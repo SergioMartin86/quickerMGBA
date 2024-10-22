@@ -1,64 +1,44 @@
 #pragma once
 
-typedef  uint8_t uint8;
-typedef  uint16_t uint16;
-typedef  int8_t int16;
-
-#include "../gpgxInstanceBase.hpp"
+#include "../mgbaInstanceBase.hpp"
 #include <string>
 #include <vector>
+#include <jaffarCommon/exceptions.hpp>
+#include <jaffarCommon/json.hpp>
 #include <jaffarCommon/serializers/contiguous.hpp>
 #include <jaffarCommon/deserializers/contiguous.hpp>
 
-#define DUMMY_SIZE 1048576
-
-extern "C"
-{ 
- int state_load(unsigned char *state);
- int state_save(unsigned char *state);
- void initialize();
- void initializeVideoOutput();
- void finalizeVideoOutput();
- void loadROM(const char* filePath);
- void renderFrame();
- void advanceFrame(const uint16_t controller1, const uint16_t controller2);
- uint8_t* getWorkRamPtr();
-}
-
-namespace gpgx
+namespace mgba
 {
 
 class EmuInstance : public EmuInstanceBase
 {
  public:
 
- uint8_t* _baseMem;
- uint8_t* _apuMem;
 
  EmuInstance(const nlohmann::json &config) : EmuInstanceBase(config)
  {
  }
 
+ ~EmuInstance()
+ {
+ }
+
   virtual void initialize() override
   {
-    ::initialize();
   }
 
   virtual bool loadROMImpl(const std::string &romFilePath) override
   {
-    ::loadROM(romFilePath.c_str());
-
     return true;
   }
 
   void initializeVideoOutput() override
   {
-    ::initializeVideoOutput();
   }
 
   void finalizeVideoOutput() override
   {
-    ::finalizeVideoOutput();
   }
 
   void enableRendering() override
@@ -71,40 +51,45 @@ class EmuInstance : public EmuInstanceBase
 
   void serializeState(jaffarCommon::serializer::Base& s) const override
   {
-    auto buffer = (uint8_t*) malloc(DUMMY_SIZE);
-    auto size = ::state_save(buffer);
-    s.push(buffer, size);
-    free (buffer);
+    // auto size = ::state_save(_dummyBuffer);
+    // s.push(_dummyBuffer, size);
   }
 
   void deserializeState(jaffarCommon::deserializer::Base& d) override
   {
-    ::state_load((unsigned char*)d.getInputDataBuffer());
+    // d.pop(_dummyBuffer, _stateSize);
+    // ::state_load(_dummyBuffer);
   }
 
   size_t getStateSizeImpl() const override
   {
-    auto buffer = (uint8_t*) malloc(DUMMY_SIZE);
-    auto size = ::state_save(buffer);
-    free (buffer);
-    return size;
+    return 0;
   }
 
   void updateRenderer() override
   {
-    ::renderFrame();
   }
 
-  inline size_t getDifferentialStateSizeImpl() const override { return getStateSizeImpl(); }
+  inline size_t getDifferentialStateSizeImpl() const override { return 0; }
 
-  void enableLiteStateBlockImpl(const std::string& block)
+  void setWorkRamSerializationSizeImpl(const size_t size) override
   {
-    // Nothing to do here
   }
 
-  void disableLiteStateBlockImpl(const std::string& block)
+  void enableStateBlockImpl(const std::string& block) override
   {
-    // Nothing to do here
+    // if (block == "VRAM") { ::enableVRAMBlock(); return; }
+    // if (block == "SATM") { ::enableSATMBlock(); return; }
+
+    // JAFFAR_THROW_LOGIC("State block name: '%s' not found.", block.c_str());
+  }
+
+  void disableStateBlockImpl(const std::string& block) override
+  {
+    // if (block == "VRAM") { ::disableVRAMBlock(); return; }
+    // if (block == "SATM") { ::disableSATMBlock(); return; }
+
+    // JAFFAR_THROW_LOGIC("State block name: '%s' not found", block.c_str());
   }
 
   void doSoftReset() override
@@ -115,19 +100,31 @@ class EmuInstance : public EmuInstanceBase
   {
   }
 
-  std::string getCoreName() const override { return "GPGX Base"; }
+  std::string getCoreName() const override { return "MGBA Base"; }
 
 
   virtual void advanceStateImpl(const jaffar::port_t controller1, const jaffar::port_t controller2)
   {
-     ::advanceFrame(controller1, controller2);
+  }
+
+  inline uint8_t* getVideoRamPointer() const override
+  {
+    return nullptr;
   }
 
   inline uint8_t* getWorkRamPointer() const override
   {
-    return getWorkRamPtr();
+    return nullptr;
   }
+
+  inline size_t getWorkRamSize() const 
+  {
+    return 0;
+  }
+
+  private:
+
 
 };
 
-} // namespace gpgx
+} // namespace mgba

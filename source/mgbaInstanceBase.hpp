@@ -9,7 +9,7 @@
 #include <jaffarCommon/deserializers/contiguous.hpp>
 #include "inputParser.hpp"
 
-namespace gpgx
+namespace mgba
 {
 
 class EmuInstanceBase
@@ -128,4 +128,4 @@ class EmuInstanceBase
   std::unique_ptr<jaffar::InputParser> _inputParser;
 };
 
-} // namespace gpgx
+} // namespace mgba
