@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   const auto configJs = nlohmann::json::parse(configJsRaw);
 
   // Getting rom file path
-  const auto romFilePath = jaffarCommon::json::getString(configJs, "Rom File");
+  const auto romFilePath = jaffarCommon::json::getString(configJs, "ROM File Path");
 
   // Getting initial state file path
   const auto initialStateFilePath = jaffarCommon::json::getString(configJs, "Initial State File");
@@ -72,14 +72,8 @@ int main(int argc, char *argv[])
   std::string stateDisabledBlocksOutput;
   for (const auto& entry : stateDisabledBlocks) stateDisabledBlocksOutput += entry + std::string(" ");
   
-  // Getting System Type
-  const auto systemType = jaffarCommon::json::getString(configJs, "System Type");
-
-  // Getting Controller 1 type
-  const auto controller1Type = jaffarCommon::json::getString(configJs, "Controller 1 Type");
-
-  // Getting Controller 2 type
-  const auto controller2Type = jaffarCommon::json::getString(configJs, "Controller 2 Type");
+  // Getting Controller type
+  const auto controllerType = jaffarCommon::json::getString(configJs, "Controller Type");
 
   // Getting reproduce flag
   bool isReproduce = program.get<bool>("--reproduce");
@@ -93,19 +87,29 @@ int main(int argc, char *argv[])
   if (status == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = jaffarCommon::string::split(inputSequence, ' ');
+  const auto sequence = jaffarCommon::string::split(inputSequence, '\n');
 
   // Initializing terminal
   jaffarCommon::logger::initializeTerminal();
 
   // Printing provided parameters
-  jaffarCommon::logger::log("[] Rom File Path:      '%s'\n", romFilePath.c_str());
+  jaffarCommon::logger::log("[] ROM File Path:      '%s'\n", romFilePath.c_str());
   jaffarCommon::logger::log("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
   jaffarCommon::logger::log("[] Sequence Length:    %lu\n", sequence.size());
   jaffarCommon::logger::log("[] State File Path:    '%s'\n", initialStateFilePath.empty() ? "<Boot Start>" : initialStateFilePath.c_str());
   jaffarCommon::logger::log("[] Generating Sequence...\n");
 
   jaffarCommon::logger::refreshTerminal();
+
+  // Loading ROM File
+  std::string romFileData;
+  if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
+
+  // Calculating ROM SHA1
+  auto romSHA1 = jaffarCommon::hash::getSHA1String(romFileData);
+
+  // Checking with the expected SHA1 hash
+  if (romSHA1 != expectedROMSHA1) JAFFAR_THROW_LOGIC("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
 
   // Creating emulator instance  
   auto e = mgba::EmuInstance(configJs);
@@ -115,17 +119,9 @@ int main(int argc, char *argv[])
 
   // Initializing video output
   if (disableRender == false) e.initializeVideoOutput();
-  
-  // Loading ROM File
-  std::string romFileData;
-  if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
-  e.loadROM(romFilePath);
 
-  // Calculating ROM SHA1
-  auto romSHA1 = jaffarCommon::hash::getSHA1String(romFileData);
-
-  // Checking with the expected SHA1 hash
-  if (romSHA1 != expectedROMSHA1) JAFFAR_THROW_LOGIC("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
+  // If rendering enabled, then initailize it now
+  if (disableRender == false) e.enableRendering();
 
   // If an initial state is provided, load it now
   if (initialStateFilePath != "")
@@ -151,9 +147,6 @@ int main(int argc, char *argv[])
 
   // Flag to display frame information
   bool showFrameInfo = true;
-
-  // If rendering enabled, then initailize it now
-  if (disableRender == false) e.enableRendering();
 
   // Interactive section
   while (continueRunning)
@@ -190,7 +183,7 @@ int main(int argc, char *argv[])
     showFrameInfo = true;
 
     // Get command
-    auto command = jaffarCommon::logger::getKeyPress();
+    auto command = jaffarCommon::logger::waitForKeyPress();
 
     // Advance/Rewind commands
     if (command == 'n') currentStep = currentStep - 1;
@@ -233,7 +226,7 @@ int main(int argc, char *argv[])
   if (disableRender == false) e.finalizeVideoOutput();
 
   // If rendering enabled, then finalize it now
-  if (disableRender == false) e.enableRendering();
+  if (disableRender == false) e.disableRendering();
 
   // Ending ncurses window
   jaffarCommon::logger::finalizeTerminal();

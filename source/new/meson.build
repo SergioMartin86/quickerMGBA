@@ -91,7 +91,7 @@ newMGBASrc =  [
 	'core/src/util/vector.c',
 	'core/src/util/vfs.c',
 	'core/src/util/vfs/vfs-mem.c',
-	'core/src/platform/bizhawk/bizinterface.c',
+	'../bizinterface.c',
 	'core/src/platform/bizhawk/localtime_r.c',
   'core/src/platform/posix/memory.c',
 ]

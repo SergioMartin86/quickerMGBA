@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   const auto configJs = nlohmann::json::parse(configJsRaw);
 
   // Getting rom file path
-  const auto romFilePath = jaffarCommon::json::getString(configJs, "Rom File");
+  const auto romFilePath = jaffarCommon::json::getString(configJs, "ROM File Path");
 
   // Getting initial state file path
   const auto initialStateFilePath = jaffarCommon::json::getString(configJs, "Initial State File");
@@ -86,14 +86,8 @@ int main(int argc, char *argv[])
   std::string stateDisabledBlocksOutput;
   for (const auto& entry : stateDisabledBlocks) stateDisabledBlocksOutput += entry + std::string(" ");
   
-  // Getting System Type
-  const auto systemType = jaffarCommon::json::getString(configJs, "System Type");
-
-  // Getting Controller 1 type
-  const auto controller1Type = jaffarCommon::json::getString(configJs, "Controller 1 Type");
-
-  // Getting Controller 2 type
-  const auto controller2Type = jaffarCommon::json::getString(configJs, "Controller 2 Type");
+  // Getting Controller type
+  const auto controllerType = jaffarCommon::json::getString(configJs, "Controller Type");
 
   // Getting differential compression configuration
   if (configJs.contains("Differential Compression") == false) JAFFAR_THROW_LOGIC("Script file missing 'Differential Compression' entry\n");
@@ -112,20 +106,22 @@ int main(int argc, char *argv[])
   if (differentialCompressionJs["Use Zlib"].is_boolean() == false) JAFFAR_THROW_LOGIC("Script file 'Differential Compression / Use Zlib' entry is not a boolean\n");
   const auto differentialCompressionUseZlib = differentialCompressionJs["Use Zlib"].get<bool>();
 
+  // Loading ROM File
+  std::string romFileData;
+  if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
+
+  // Calculating ROM SHA1
+  auto romSHA1 = jaffarCommon::hash::getSHA1String(romFileData);
+
+  // Checking with the expected SHA1 hash
+  if (romSHA1 != expectedROMSHA1) JAFFAR_THROW_LOGIC("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
+
   // Creating emulator instance
   auto e = mgba::EmuInstance(configJs);
 
   // Initializing emulator instance
   e.initialize();
   
-  // Loading ROM File
-  std::string romFileData;
-  if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
-  e.loadROM(romFilePath);
-
-  // Calculating ROM SHA1
-  auto romSHA1 = jaffarCommon::hash::getSHA1String(romFileData);
-
   // If an initial state is provided, load it now
   if (initialStateFilePath != "")
   {
@@ -148,15 +144,12 @@ int main(int argc, char *argv[])
   const auto fixedDiferentialStateSize = e.getDifferentialStateSize();
   const auto fullDifferentialStateSize = fixedDiferentialStateSize + differentialCompressionMaxDifferences;
 
-  // Checking with the expected SHA1 hash
-  if (romSHA1 != expectedROMSHA1) JAFFAR_THROW_LOGIC("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
-
   // Loading sequence file
   std::string sequenceRaw;
   if (jaffarCommon::file::loadStringFromFile(sequenceRaw, sequenceFilePath) == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = jaffarCommon::string::split(sequenceRaw, ' ');
+  const auto sequence = jaffarCommon::string::split(sequenceRaw, '\n');
 
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
@@ -177,7 +170,7 @@ int main(int argc, char *argv[])
   printf("[] Cycle Type:                             '%s'\n", cycleType.c_str());
   printf("[] Emulation Core:                         '%s'\n", emulationCoreName.c_str());
   printf("[] ROM File:                               '%s'\n", romFilePath.c_str());
-  printf("[] Controller Types:                       '%s' / '%s'\n", controller1Type.c_str(), controller2Type.c_str());
+  printf("[] Controller Type:                        '%s'\n", controllerType.c_str());
   printf("[] ROM Hash:                               'SHA1: %s'\n", romSHA1.c_str());
   printf("[] Sequence File:                          '%s'\n", sequenceFilePath.c_str());
   printf("[] Sequence Length:                        %lu\n", sequenceLength);

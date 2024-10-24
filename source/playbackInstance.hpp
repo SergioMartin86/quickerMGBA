@@ -12,6 +12,7 @@ struct stepData_t
   jaffar::input_t inputData;
   std::string inputString;
   uint8_t *stateData;
+  uint8_t *videoBuffer;
   jaffarCommon::hash::hash_t hash;
 };
 
@@ -23,6 +24,10 @@ class PlaybackInstance
   PlaybackInstance(mgba::EmuInstance *emu, const std::vector<std::string> &sequence, const std::string& cycleType) :
    _emu(emu)
   {
+    // Getting video buffer size
+    _videoBufferSize = _emu->getVideoBufferSize();
+    _videoBufferPtr = _emu->getVideoBufferPtr();
+
     // Getting full state size
     _fullStateSize = _emu->getStateSize();  
 
@@ -48,6 +53,10 @@ class PlaybackInstance
       // Saving step data
       step.stateData = (uint8_t *)malloc(_fullStateSize);
       memcpy(step.stateData, stateData, _fullStateSize);
+
+      // Creating step's video buffer
+      step.videoBuffer = (uint8_t *)malloc(_videoBufferSize);
+      memcpy(step.videoBuffer, _videoBufferPtr, _videoBufferSize); 
 
       // Adding the step into the sequence
       _stepSequence.push_back(step);
@@ -90,10 +99,9 @@ class PlaybackInstance
     // Checking the required step id does not exceed contents of the sequence
     if (stepId > _stepSequence.size()) JAFFAR_THROW_RUNTIME("[Error] Attempting to render a step larger than the step sequence");
 
-    // Else we load the requested step
-    const auto stateData = getStateData(stepId);
-    jaffarCommon::deserializer::Contiguous d(stateData, _fullStateSize);
-    _emu->deserializeState(d);
+    // Updating video buffer
+    const auto &step = _stepSequence[stepId];
+    memcpy(_videoBufferPtr, step.videoBuffer, _videoBufferSize);
 
     // Updating image
     _emu->updateRenderer();
@@ -162,4 +170,8 @@ class PlaybackInstance
 
   // Full size of the game state
   size_t _fullStateSize;
+
+  // Video buffer
+  size_t _videoBufferSize;
+  uint8_t* _videoBufferPtr;
 };

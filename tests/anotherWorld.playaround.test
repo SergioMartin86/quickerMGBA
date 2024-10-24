@@ -1,0 +1,14 @@
+{
+  "ROM File Path": "roms/Another_world.gba",
+  "Expected ROM SHA1": "41D39A0C34F72469DD3FBCC90190605B8ADA93E6",
+  "Initial State File": "",
+  "Disable State Blocks": [ ],
+  "Bios File Path": "roms/GBA_bios.rom",
+  "Controller Type": "Gameboy Advance",
+  "Differential Compression":
+  {
+    "Enabled": false,
+    "Max Differences": 2200,
+    "Use Zlib": true
+  }
+}

@@ -15,58 +15,11 @@ class EmuInstance : public EmuInstanceBase
 {
  public:
 
-
- EmuInstance(const nlohmann::json &config) : EmuInstanceBase(config)
- {
- }
-
- ~EmuInstance()
- {
- }
-
-  virtual void initialize() override
+  EmuInstance(const nlohmann::json &config) : EmuInstanceBase(config)
   {
   }
 
-  virtual bool loadROMImpl(const std::string &romFilePath) override
-  {
-    return true;
-  }
-
-  void initializeVideoOutput() override
-  {
-  }
-
-  void finalizeVideoOutput() override
-  {
-  }
-
-  void enableRendering() override
-  {
-  }
-
-  void disableRendering() override
-  {
-  }
-
-  void serializeState(jaffarCommon::serializer::Base& s) const override
-  {
-    // auto size = ::state_save(_dummyBuffer);
-    // s.push(_dummyBuffer, size);
-  }
-
-  void deserializeState(jaffarCommon::deserializer::Base& d) override
-  {
-    // d.pop(_dummyBuffer, _stateSize);
-    // ::state_load(_dummyBuffer);
-  }
-
-  size_t getStateSizeImpl() const override
-  {
-    return 0;
-  }
-
-  void updateRenderer() override
+  ~EmuInstance()
   {
   }
 
@@ -102,25 +55,6 @@ class EmuInstance : public EmuInstanceBase
 
   std::string getCoreName() const override { return "MGBA Base"; }
 
-
-  virtual void advanceStateImpl(const jaffar::port_t controller1, const jaffar::port_t controller2)
-  {
-  }
-
-  inline uint8_t* getVideoRamPointer() const override
-  {
-    return nullptr;
-  }
-
-  inline uint8_t* getWorkRamPointer() const override
-  {
-    return nullptr;
-  }
-
-  inline size_t getWorkRamSize() const 
-  {
-    return 0;
-  }
 
   private:
 
