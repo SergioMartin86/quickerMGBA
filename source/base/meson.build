@@ -120,15 +120,14 @@ baseMGBAIncludeDirs = [
 ]
 
 baseMGBACompileArgs = [
-	'-DMINIMAL_CORE=2',
+ 	'-DMINIMAL_CORE=2',
   '-DDISABLE_THREADING',
   '-DM_CORE_GBA',
   '-DCOLOR_16_BIT',
   '-DMGBA_STANDALONE',
   '-DENABLE_DEBUGGERS',
   '-DHAVE_LOCALE',
-  '-DHAVE_LOCALTIME_R',
-  '-DHAVE_NEWLOCALE'
+  '-DHAVE_LOCALTIME_R'
 ]
 
 # baseMGBA Core Configuration

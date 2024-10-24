@@ -74,8 +74,8 @@ class EmuInstanceBase
     int64_t time = 1729787535;
     time += (_emulationStep * 4389L) >> 18;
 
-    if (_renderingEnabled == true) BizAdvance(_emu, input.port, time, 0, 0, 0, 0, _videoBuffer);
-    if (_renderingEnabled == false) BizAdvance(_emu, input.port, time, 0, 0, 0, 0, NULL);
+    if (_renderingEnabled == true) BizAdvance(_emu, input.port, time, 0, 0, 0, 255, _videoBuffer);
+    if (_renderingEnabled == false) BizAdvance(_emu, input.port, time, 0, 0, 0, 255, NULL);
 
     _emulationStep++;
   }

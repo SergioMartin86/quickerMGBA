@@ -109,12 +109,12 @@ public:
     // Left
     c = ss.get();
     if (c != '.' && c != 'L') reportBadInputString(inputString, c);
-    if (c == 'L') code |= GBA_KEY_L;
+    if (c == 'L') code |= GBA_KEY_LEFT;
 
     // Right
     c = ss.get();
     if (c != '.' && c != 'R') reportBadInputString(inputString, c);
-    if (c == 'R') code |= GBA_KEY_R;
+    if (c == 'R') code |= GBA_KEY_RIGHT;
 
     // Start
     c = ss.get();

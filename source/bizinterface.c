@@ -217,6 +217,18 @@ EXP bool BizClearWatchpoint(bizctx* ctx, ssize_t id)
 	return ctx->debugger.platform->clearBreakpoint(ctx->debugger.platform, id);
 }
 
+EXP void BizSetSoundMask(bizctx* ctx, uint32_t mask)
+{
+	for (int i = 0; i < 6; i++)
+		ctx->core->enableAudioChannel(ctx->core, i, mask & 1 << i);
+}
+
+EXP void BizSetLayerMask(bizctx *ctx, uint32_t mask)
+{
+	for (int i = 0; i < 5; i++)
+		ctx->core->enableVideoLayer(ctx->core, i, mask & 1 << i);
+}
+
 EXP void* BizCreate(const void* bios, const void* data, uint32_t length, bool skipbios)
 {
 		overrideinfo oinfo;
@@ -246,6 +258,7 @@ EXP void* BizCreate(const void* bios, const void* data, uint32_t length, bool sk
 		 for (uint8_t b = 0; b < 16; b++)
 			 for (uint8_t a = 0; a < 16; a++)
 				 ctx->palette[idx++] = (16 * r << 24) + (16 * g << 16) + (16 * b << 8) + 16 * a;
+
 
 	ctx->logger.log = logdebug;
 	mLogSetDefaultLogger(&ctx->logger);
@@ -573,18 +586,6 @@ EXP bool BizPutState(bizctx* ctx, const void* data, uint32_t size)
 	bool ret = mCoreLoadStateNamed(ctx->core, vf, SAVESTATE_SAVEDATA);
 	vf->close(vf);
 	return ret;
-}
-
-EXP void BizSetLayerMask(bizctx *ctx, uint32_t mask)
-{
-	for (int i = 0; i < 5; i++)
-		ctx->core->enableVideoLayer(ctx->core, i, mask & 1 << i);
-}
-
-EXP void BizSetSoundMask(bizctx* ctx, uint32_t mask)
-{
-	for (int i = 0; i < 6; i++)
-		ctx->core->enableAudioChannel(ctx->core, i, mask & 1 << i);
 }
 
 EXP void BizGetRegisters(bizctx* ctx, int32_t* dest)
