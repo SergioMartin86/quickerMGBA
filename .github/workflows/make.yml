@@ -2,9 +2,9 @@ name: Build and Run Tests
 
 on:
   pull_request:
-    branches: [ "tasvideos-1-25a90c6" ]
+    branches: [ "main" ]
   push:
-    branches: [ "tasvideos-1-25a90c6" ]
+    branches: [ "main" ]
 
 jobs:
   build:

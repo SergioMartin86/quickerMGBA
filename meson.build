@@ -61,6 +61,6 @@ baseMGBATester = executable('baseMGBATester',
 )
 
 # Building tests
-# subdir('tests')
+subdir('tests')
 
 endif # If not subproject
