@@ -1,0 +1,14 @@
+{
+  "ROM File Path": "roms/tollrunner_jam.gba",
+  "Expected ROM SHA1": "6F8A4C68FA3280E70C45AAC2EC8EC27631613937",
+  "Initial State File": "",
+  "Disable State Blocks": [ ],
+  "Bios File Path": "",
+  "Controller Type": "Gameboy Advance",
+  "Differential Compression":
+  {
+    "Enabled": false,
+    "Max Differences": 2200,
+    "Use Zlib": true
+  }
+}
