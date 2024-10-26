@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   const auto configJs = nlohmann::json::parse(configJsRaw);
 
   // Getting rom file path
-  const auto romFilePath = jaffarCommon::json::getString(configJs, "ROM File Path");
+  const auto romFilePath = jaffarCommon::json::getString(configJs, "Rom File Path");
 
   // Getting initial state file path
   const auto initialStateFilePath = jaffarCommon::json::getString(configJs, "Initial State File");
@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
   // Getting sequence file path
   std::string sequenceFilePath = program.get<std::string>("sequenceFile");
 
-    // Getting expected ROM SHA1 hash
-  const auto expectedROMSHA1 = jaffarCommon::json::getString(configJs, "Expected ROM SHA1");
+    // Getting expected Rom SHA1 hash
+  const auto expectedRomSHA1 = jaffarCommon::json::getString(configJs, "Expected Rom SHA1");
 
   // Parsing disabled blocks in lite state serialization
   const auto stateDisabledBlocks = jaffarCommon::json::getArray<std::string>(configJs, "Disable State Blocks");
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   jaffarCommon::logger::initializeTerminal();
 
   // Printing provided parameters
-  jaffarCommon::logger::log("[] ROM File Path:      '%s'\n", romFilePath.c_str());
+  jaffarCommon::logger::log("[] Rom File Path:      '%s'\n", romFilePath.c_str());
   jaffarCommon::logger::log("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
   jaffarCommon::logger::log("[] Sequence Length:    %lu\n", sequence.size());
   jaffarCommon::logger::log("[] State File Path:    '%s'\n", initialStateFilePath.empty() ? "<Boot Start>" : initialStateFilePath.c_str());
@@ -101,15 +101,15 @@ int main(int argc, char *argv[])
 
   jaffarCommon::logger::refreshTerminal();
 
-  // Loading ROM File
+  // Loading Rom File
   std::string romFileData;
   if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
 
-  // Calculating ROM SHA1
+  // Calculating Rom SHA1
   auto romSHA1 = jaffarCommon::hash::getSHA1String(romFileData);
 
   // Checking with the expected SHA1 hash
-  if (romSHA1 != expectedROMSHA1) JAFFAR_THROW_LOGIC("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
+  if (romSHA1 != expectedRomSHA1) JAFFAR_THROW_LOGIC("Wrong Rom SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedRomSHA1.c_str());
 
   // Creating emulator instance  
   auto e = mgba::EmuInstance(configJs);

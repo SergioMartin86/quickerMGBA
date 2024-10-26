@@ -14,15 +14,15 @@
 
 struct MemoryAreas 
 {
-	const void* bios;
-	const void* wram;
-	const void* iwram;
-	const void* mmio;
-	const void* palram;
-	const void* vram;
-	const void* oam;
-	const void* rom;
-	const void* sram;
+	void* bios;
+	void* wram;
+	void* iwram;
+	void* mmio;
+	void* palram;
+	void* vram;
+	void* oam;
+	void* rom;
+	void* sram;
 };
 
 struct MemorySizes
@@ -60,7 +60,7 @@ class EmuInstanceBase
 
   EmuInstanceBase(const nlohmann::json &config)
   {
-    _romFilePath = jaffarCommon::json::getString(config, "ROM File Path");
+    _romFilePath = jaffarCommon::json::getString(config, "Rom File Path");
     _biosFilePath = jaffarCommon::json::getString(config, "Bios File Path");
     _inputParser = std::make_unique<jaffar::InputParser>(config);
   }
@@ -96,10 +96,10 @@ class EmuInstanceBase
 
   void initialize()
   {
-    // Reading from ROM file
+    // Reading from Rom file
     std::string romFileData;
     bool        status = jaffarCommon::file::loadStringFromFile(romFileData, _romFilePath.c_str());
-    if (status == false) JAFFAR_THROW_LOGIC("Could not find/read from ROM file: %s\n", _romFilePath.c_str());
+    if (status == false) JAFFAR_THROW_LOGIC("Could not find/read from Rom file: %s\n", _romFilePath.c_str());
 
     // Reading from Bios file, if defined
     std::string biosFileData;
@@ -233,6 +233,9 @@ class EmuInstanceBase
 
   size_t getVideoBufferSize() const { return _videoBufferSize; }
   uint8_t* getVideoBufferPtr() const { return (uint8_t*)_videoBuffer; }
+
+  MemoryAreas getMemoryAreas() const { return _memoryAreas; }
+  MemorySizes getMemorySizes() const { return _memorySizes; }
 
   // Virtual functions
 
