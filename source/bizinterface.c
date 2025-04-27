@@ -525,7 +525,7 @@ EXP void BizGetMemorySizes(bizctx* ctx, struct MemorySizes* dst)
 	ctx->core->getMemoryBlock(ctx->core, GBA_REGION_BIOS, &dst->bios);
  ctx->core->getMemoryBlock(ctx->core, GBA_REGION_EWRAM, &dst->wram);
 	ctx->core->getMemoryBlock(ctx->core, GBA_REGION_IWRAM, &dst->iwram);
-	dst->mmio = ctx->gba->memory.io;
+	dst->mmio = sizeof(ctx->gba->memory.io);
 	ctx->core->getMemoryBlock(ctx->core, GBA_REGION_PALETTE_RAM, &dst->palram);
 	ctx->core->getMemoryBlock(ctx->core, GBA_REGION_VRAM, &dst->vram);
 	ctx->core->getMemoryBlock(ctx->core, GBA_REGION_OAM, &dst->oam);
@@ -534,11 +534,11 @@ EXP void BizGetMemorySizes(bizctx* ctx, struct MemorySizes* dst)
 	// getMemoryBlock is avoided because mGBA doesn't always know save type at startup,
 	// so getMemoryBlock may return nothing until the save type is detected.
 	// (returning the buffer directly avoids 0-size and variable-size savedata)
-	dst->sram = ctx->sram;
+	dst->sram = sizeof(ctx->sram);
 	// If ROM is not present (due to multiboot), send our raw buffer over
 	if (!dst->rom)
 	{
-		dst->rom = ctx->rom;
+		dst->rom = sizeof(ctx->rom);
 	}
 }
 
